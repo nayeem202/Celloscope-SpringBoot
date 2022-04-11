@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import com.example.model.User;
 import com.example.repository.UserRepository;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600)
 public class UserController {
 
 	@Autowired
@@ -26,26 +28,23 @@ public class UserController {
 	public ResponseEntity<Map> save(@RequestBody User user) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
+
 		try {
 
-			List<User> users = (List<User>) userRepository.findAll();
+			Optional<User> dbuser = userRepository.findById(user.getUserId());
 
-			for (User other : users) {
-				if (other.getUserId() == (user.getUserId())) {
-					map.put("message", "Already exists");
-					map.put("status", "failed to save");
-					return ResponseEntity.ok(map);
+			if (!dbuser.isEmpty()) {
+				map.put("message", "Already exists");
+				map.put("status", "failed to save");
+				return ResponseEntity.status(403).body(map);
 
-				} else {
-					user = userRepository.save(user);
-					map.put("data", user);
-					map.put("status", 200);
-					map.put("message", "data successfully saved");
-					return ResponseEntity.ok(map);
-				}
-
+			} else {
+				user = userRepository.save(user);
+				map.put("data", user);
+				map.put("status", 200);
+				map.put("message", "data successfully saved");
+				return ResponseEntity.ok(map);
 			}
-			return ResponseEntity.ok(map);
 
 		} catch (Exception e) {
 			map.put("message", "data failed to save");
@@ -74,7 +73,7 @@ public class UserController {
 				map.put("message", "data successfully updated");
 				return ResponseEntity.ok(map);
 			}
-    
+
 		} catch (Exception e) {
 			map.put("message", "data failed to update");
 			map.put("error", e.getLocalizedMessage());
@@ -86,6 +85,7 @@ public class UserController {
 
 	@PostMapping("/login")
 	public ResponseEntity<Map<String, Object>> loginUser(@RequestBody User user) {
+
 		List<User> users = (List<User>) userRepository.findAll();
 		Map<String, Object> map = new HashMap<String, Object>();
 
@@ -104,5 +104,29 @@ public class UserController {
 		map.put("data", null);
 		return ResponseEntity.status(409).body(map);
 	}
+	
+	
+	@PostMapping("/reset_password")
+	public ResponseEntity<Map<String, Object>> resetpass(@RequestBody User user) {
+
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		User dbuser = userRepository.findById(user.getUserId()).get();
+		
+			if (dbuser.getUserId() == (user.getUserId()) && dbuser.getMobile().equals(user.getMobile())) {
+				map.put("message", "Provided  Information Matched");
+				map.put("status", "Success");
+				map.put("data", dbuser);
+				return ResponseEntity.ok(map);
+
+			}
+		
+
+		map.put("message", "Not Matched");
+		map.put("status", "Failed");
+		map.put("data", null);
+		return ResponseEntity.status(409).body(map);
+	}
+	
 
 }
