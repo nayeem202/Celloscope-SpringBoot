@@ -62,36 +62,7 @@ public class UserController {
 
 	}
 
-	@PutMapping("/update_password")
-	public ResponseEntity<Map> update(@RequestBody User user) {
-
-		Map<String, Object> map = new HashMap<String, Object>();
-		try {
-			Optional<User> dbuser = userRepository.findById(user.getUserId());
-
-			if (dbuser.isEmpty()) {
-				map.put("message", "User not found");
-				map.put("status", "failed to save");
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
-			} else {
-				user = userRepository.save(user);
-				map.put("data", user);
-				map.put("status", 200);
-				map.put("message", "data successfully updated");
-				logger.info("Upadated user password");
-				return ResponseEntity.ok(map);
-			}
-
-		} catch (Exception e) {
-			map.put("message", "data failed to update");
-			map.put("error", e.getLocalizedMessage());
-			logger.info("password failed to update");
-			return ResponseEntity.status(500).body(map);
-
-		}
-
-	}
-
+	
 	@PostMapping("/login")
 	public ResponseEntity<Map<String, Object>> loginUser(@RequestBody User user) {
 
@@ -137,5 +108,38 @@ public class UserController {
 		logger.error("user information not matched");
 		return ResponseEntity.status(409).body(map);
 	}
+	
+	@PutMapping("/update_password")
+	public ResponseEntity<Map> update(@RequestBody User user) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			Optional<User> dbuser = userRepository.findById(user.getUserId());
+
+			if (dbuser.isEmpty()) {
+				map.put("message", "User not found");
+				map.put("status", "failed to save");
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
+			} else {
+				user = userRepository.save(user);
+				map.put("data", user);
+				map.put("status", 200);
+				map.put("message", "data successfully updated");
+				logger.info("Upadated user password");
+				return ResponseEntity.ok(map);
+			}
+
+		} catch (Exception e) {
+			map.put("message", "data failed to update");
+			map.put("error", e.getLocalizedMessage());
+			logger.info("password failed to update");
+			return ResponseEntity.status(500).body(map);
+
+		}
+
+	}
+
+	
+	
 
 }
