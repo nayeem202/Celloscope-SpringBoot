@@ -1,5 +1,7 @@
 # CURL commands for testing api
 
+
+
   curl --location --request POST 'http://localhost:8080/save_user' \
   --header 'Content-Type: application/json' \
   --data-raw '{
@@ -8,6 +10,7 @@
       "password" : "4321",
       "mobile" : "5656556565"
       }'
+      
 
       curl --location --request POST 'http://localhost:8080/login' \
   --header 'Content-Type: application/json' \
